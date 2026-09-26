@@ -1,0 +1,835 @@
+-- Roblox Kenshin Hub Pro (Panda Auth V4 - Exclusive Paid Version)
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- تحميل مكتبة Panda Auth V4 الرسمية
+local PUSL = nil
+pcall(function()
+    PUSL = loadstring(game:HttpGet("https://secure.pandauth.com/pv4/lib"))()
+end)
+
+if PUSL and type(PUSL.configure) == "function" then
+    PUSL.configure({
+        serviceId = "kenshinhub",
+    })
+end
+
+-- دالة التحقق الرسمية عبر مكتبة Panda V4
+local function validateKey(userKey)
+    if not PUSL or type(PUSL.validate) ~= "function" then
+        return false
+    end
+    
+    local success, result = pcall(function()
+        return PUSL.validate(userKey)
+    end)
+    
+    if success and result then
+        return result.success == true
+    end
+    return false
+end
+
+-- [بناء واجهة إدخال المفتاح (مخصصة للبيع فقط بدون زر الحصول على مفتاح)]
+if PlayerGui:FindFirstChild("KenshinAuthGUI") then
+    PlayerGui.KenshinAuthGUI:Destroy()
+end
+if PlayerGui:FindFirstChild("KenshinHubGUI") then
+    PlayerGui.KenshinHubGUI:Destroy()
+end
+
+local AuthGui = Instance.new("ScreenGui")
+AuthGui.Name = "KenshinAuthGUI"
+AuthGui.ResetOnSpawn = false
+AuthGui.Parent = PlayerGui
+
+local AuthFrame = Instance.new("Frame")
+AuthFrame.Parent = AuthGui
+AuthFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+AuthFrame.Position = UDim2.new(0.5, -175, 0.5, -90)
+AuthFrame.Size = UDim2.new(0, 350, 0, 175)
+AuthFrame.Active = true
+AuthFrame.Draggable = true
+
+local authCorner = Instance.new("UICorner")
+authCorner.CornerRadius = UDim.new(0, 10)
+authCorner.Parent = AuthFrame
+
+local authStroke = Instance.new("UIStroke")
+authStroke.Parent = AuthFrame
+authStroke.Color = Color3.fromRGB(255, 215, 0)
+authStroke.Thickness = 1.5
+
+local AuthTitle = Instance.new("TextLabel")
+AuthTitle.Parent = AuthFrame
+AuthTitle.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+AuthTitle.Size = UDim2.new(1, 0, 0, 40)
+AuthTitle.Font = Enum.Font.SourceSansBold
+AuthTitle.Text = "  🔑 KENSHIN HUB | VIP Access"
+AuthTitle.TextColor3 = Color3.fromRGB(255, 215, 0)
+AuthTitle.TextSize = 14
+AuthTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local titleCorner2 = Instance.new("UICorner")
+titleCorner2.CornerRadius = UDim.new(0, 10)
+titleCorner2.Parent = AuthTitle
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Parent = AuthFrame
+KeyInput.Position = UDim2.new(0.1, 0, 0.32, 0)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 38)
+KeyInput.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+KeyInput.Font = Enum.Font.SourceSansBold
+KeyInput.PlaceholderText = "Enter your purchased key..."
+KeyInput.Text = ""
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 13
+KeyInput.ClearTextOnFocus = false
+
+local inputCorner2 = Instance.new("UICorner")
+inputCorner2.CornerRadius = UDim.new(0, 8)
+inputCorner2.Parent = KeyInput
+
+local BtnVerify = Instance.new("TextButton")
+BtnVerify.Parent = AuthFrame
+BtnVerify.Position = UDim2.new(0.1, 0, 0.58, 0)
+BtnVerify.Size = UDim2.new(0.8, 0, 0, 36)
+BtnVerify.BackgroundColor3 = Color3.fromRGB(40, 140, 60)
+BtnVerify.Font = Enum.Font.SourceSansBold
+BtnVerify.Text = "Verify Key"
+BtnVerify.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnVerify.TextSize = 14
+
+local verifyCorner = Instance.new("UICorner")
+verifyCorner.CornerRadius = UDim.new(0, 8)
+verifyCorner.Parent = BtnVerify
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = AuthFrame
+StatusLabel.Position = UDim2.new(0.1, 0, 0.82, 0)
+StatusLabel.Size = UDim2.new(0.8, 0, 0, 20)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Font = Enum.Font.SourceSansBold
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+StatusLabel.TextSize = 12
+
+local verifiedSuccessfully = false
+
+BtnVerify.MouseButton1Click:Connect(function()
+    local enteredKey = KeyInput.Text
+    if enteredKey == "" then
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "Please enter your key!"
+        return
+    end
+    
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+    StatusLabel.Text = "Checking key..."
+    
+    if validateKey(enteredKey) then
+        verifiedSuccessfully = true
+        AuthGui:Destroy()
+    else
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        StatusLabel.Text = "Invalid or expired key!"
+    end
+end)
+
+while not verifiedSuccessfully do
+    task.wait(0.5)
+end
+
+-- ==========================================
+-- 🚀 السكربت الأساسي (جميع أدواتك ومميزاتك)
+-- ==========================================
+
+pcall(function()
+    LocalPlayer.Idled:Connect(function()
+        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end)
+end)
+
+task.spawn(function()
+    local startTime = tick()
+    
+    local function createAfkTag(character)
+        local head = character:WaitForChild("Head", 5)
+        if not head then return end
+        
+        if head:FindFirstChild("AfkTimeTag") then
+            head.AfkTimeTag:Destroy()
+        end
+        
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "AfkTimeTag"
+        billboard.Size = UDim2.new(0, 220, 0, 50)
+        billboard.StudsOffset = Vector3.new(0, 4.2, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.TextSize = 18
+        textLabel.TextStrokeTransparency = 0.3
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.Parent = billboard
+        
+        task.spawn(function()
+            while billboard.Parent and character.Parent do
+                local elapsed = math.floor(tick() - startTime)
+                local hours = math.floor(elapsed / 3600)
+                local minutes = math.floor((elapsed % 3600) / 60)
+                local seconds = elapsed % 60
+                
+                textLabel.Text = string.format("👑 AFK TIME: %02d:%02d:%02d 👑", hours, minutes, seconds)
+                local hue = tick() % 5 / 5
+                textLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+                task.wait(0.5)
+            end
+        end)
+    end
+    
+    if LocalPlayer.Character then
+        createAfkTag(LocalPlayer.Character)
+    end
+    
+    LocalPlayer.CharacterAdded:Connect(function(newChar)
+        createAfkTag(newChar)
+    end)
+end)
+
+local rEvents = ReplicatedStorage:WaitForChild("rEvents")
+local openCrystalRemote = rEvents:WaitForChild("openCrystalRemote")
+local sellPetEvent = rEvents:WaitForChild("sellPetEvent")
+local sellPowerUpEvent = rEvents:WaitForChild("sellPowerUpEvent")
+
+local keepPetName = "Dual Chaos Birdies"
+local crystalName = "Ultra Shockwave Crystal"
+
+local autoOpenEnabled = false
+local autoSellEnabled = false
+local isFarmingGems = false
+local isAfkSkyActive = false
+local isAutoGlitchActive = false
+local isKillAllActive = false
+local skipToughPlayersEnabled = false
+local skipFriendsEnabled = false
+local safePlatePart = nil
+
+local glitchTargetCFrame = CFrame.new(Vector3.new(-9040.5, 7.9, -6055.5), Vector3.new(-9040.5, 7.9, -6055.5) + Vector3.new(1, 0, 0))
+local customSkipThreshold = 10000000000000 
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KenshinHubGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+MainFrame.Position = UDim2.new(0.03, 0, 0.12, 0)
+MainFrame.Size = UDim2.new(0, 360, 0, 245)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = MainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Parent = MainFrame
+stroke.Color = Color3.fromRGB(60, 60, 80)
+stroke.Thickness = 1.5
+
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "  👑 KENSHIN HUB | PRO"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+Title.TextSize = 15
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 10)
+titleCorner.Parent = Title
+
+local ToggleUIButton = Instance.new("TextButton")
+ToggleUIButton.Parent = Title
+ToggleUIButton.Position = UDim2.new(1, -32, 0, 4)
+ToggleUIButton.Size = UDim2.new(0, 26, 0, 26)
+ToggleUIButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleUIButton.Font = Enum.Font.SourceSansBold
+ToggleUIButton.Text = "-"
+ToggleUIButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleUIButton.TextSize = 16
+
+local toggleUICorner = Instance.new("UICorner")
+toggleUICorner.CornerRadius = UDim.new(0, 6)
+toggleUICorner.Parent = ToggleUIButton
+
+local TabsBar = Instance.new("Frame")
+TabsBar.Parent = MainFrame
+TabsBar.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+TabsBar.Position = UDim2.new(0, 0, 0, 35)
+TabsBar.Size = UDim2.new(1, 0, 0, 32)
+
+local function createTabButton(text, posX)
+    local btn = Instance.new("TextButton")
+    btn.Parent = TabsBar
+    btn.Position = UDim2.new(posX, 0, 0, 0)
+    btn.Size = UDim2.new(0.333, 0, 1, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(150, 150, 170)
+    btn.TextSize = 13
+    return btn
+end
+
+local btnTabPets = createTabButton("PETS", 0)
+local btnTabFarming = createTabButton("FARMING", 0.333)
+local btnTabKilling = createTabButton("KILLING", 0.666)
+
+local PagesContainer = Instance.new("Frame")
+PagesContainer.Parent = MainFrame
+PagesContainer.BackgroundTransparency = 1
+PagesContainer.Position = UDim2.new(0, 0, 0, 75)
+PagesContainer.Size = UDim2.new(1, 0, 1, -75)
+
+local function createPageFrame()
+    local page = Instance.new("Frame")
+    page.Parent = PagesContainer
+    page.BackgroundTransparency = 1
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.Visible = false
+    return page
+end
+
+local PagePets = createPageFrame()
+local PageFarming = createPageFrame()
+local PageKilling = createPageFrame()
+
+local function switchTab(selectedBtn, selectedPage)
+    btnTabPets.TextColor3 = Color3.fromRGB(150, 150, 170)
+    btnTabFarming.TextColor3 = Color3.fromRGB(150, 150, 170)
+    btnTabKilling.TextColor3 = Color3.fromRGB(150, 150, 170)
+    
+    btnTabPets.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+    btnTabFarming.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+    btnTabKilling.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+    
+    PagePets.Visible = false
+    PageFarming.Visible = false
+    PageKilling.Visible = false
+    
+    selectedBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+    selectedBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 48)
+    selectedPage.Visible = true
+end
+
+btnTabPets.MouseButton1Click:Connect(function() switchTab(btnTabPets, PagePets) end)
+btnTabFarming.MouseButton1Click:Connect(function() switchTab(btnTabFarming, PageFarming) end)
+btnTabKilling.MouseButton1Click:Connect(function() switchTab(btnTabKilling, PageKilling) end)
+
+switchTab(btnTabPets, PagePets)
+
+local isMinimized = false
+ToggleUIButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    TabsBar.Visible = not isMinimized
+    PagesContainer.Visible = not isMinimized
+    MainFrame.Size = isMinimized and UDim2.new(0, 360, 0, 35) or UDim2.new(0, 360, 0, 245)
+    ToggleUIButton.Text = isMinimized and "+" or "-"
+    ToggleUIButton.BackgroundColor3 = isMinimized and Color3.fromRGB(50, 180, 50) or Color3.fromRGB(200, 50, 50)
+end)
+
+local function createContentButton(parent, text, posY)
+    local btn = Instance.new("TextButton")
+    btn.Parent = parent
+    btn.Position = UDim2.new(0.05, 0, posY, 0)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btn.TextColor3 = Color3.fromRGB(220, 220, 220)
+    btn.TextSize = 13
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+    return btn
+end
+
+local btnOpen = createContentButton(PagePets, "🥚 Auto Open Crystal: OFF", 0.05)
+local btnSell = createContentButton(PagePets, "💰 Keep just duals chaos birdies: OFF", 0.38)
+btnSell.TextSize = 11
+
+local btnFarm = createContentButton(PageFarming, "💎 Auto Farm Gems: OFF", 0.05)
+local btnAfkSky = createContentButton(PageFarming, "☁️ AFK Sky + Reps: OFF", 0.38)
+local btnAutoGlitch = createContentButton(PageFarming, "⚡ Smart Auto Glitch: OFF", 0.71)
+
+local btnSkipTough = createContentButton(PageKilling, "🛡️ Skip Tough Durability: OFF", 0.05)
+btnSkipTough.Size = UDim2.new(0.52, 0, 0, 35)
+btnSkipTough.TextSize = 11
+
+local DurabilityInput = Instance.new("TextBox")
+DurabilityInput.Parent = PageKilling
+DurabilityInput.Position = UDim2.new(0.60, 0, 0.05, 0)
+DurabilityInput.Size = UDim2.new(0.35, 0, 0, 35)
+DurabilityInput.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+DurabilityInput.Font = Enum.Font.SourceSansBold
+DurabilityInput.PlaceholderText = "10T"
+DurabilityInput.Text = "10T"
+DurabilityInput.TextColor3 = Color3.fromRGB(0, 255, 255)
+DurabilityInput.TextSize = 12
+DurabilityInput.ClearTextOnFocus = false
+
+local inputCorner = Instance.new("UICorner")
+inputCorner.CornerRadius = UDim.new(0, 8)
+inputCorner.Parent = DurabilityInput
+
+local btnSkipFriends = createContentButton(PageKilling, "👥 Skip Friends: OFF", 0.38)
+btnSkipFriends.Size = UDim2.new(0.9, 0, 0, 35)
+btnSkipFriends.TextSize = 12
+
+local btnKillAll = createContentButton(PageKilling, "⚔️ Kill All Players: OFF", 0.71)
+
+local function parseValue(val)
+    if typeof(val) == "number" then
+        return val
+    elseif typeof(val) == "string" then
+        local str = val:gsub(",", ""):gsub(" ", ""):upper()
+        local num = tonumber(str:match("[%d%.]+")) or 0
+        if str:find("DC") then return num * 1e33
+        elseif str:find("NO") then return num * 1e30
+        elseif str:find("OC") then return num * 1e27
+        elseif str:find("SP") then return num * 1e24
+        elseif str:find("SX") then return num * 1e21
+        elseif str:find("QI") then return num * 1e18
+        elseif str:find("QA") then return num * 1e15
+        elseif str:find("T") then return num * 1e12
+        elseif str:find("B") then return num * 1e9
+        elseif str:find("M") then return num * 1e6
+        elseif str:find("K") then return num * 1e3
+        else return tonumber(str) or 0
+        end
+    end
+    return 0
+end
+
+DurabilityInput.FocusLost:Connect(function()
+    local parsed = parseValue(DurabilityInput.Text)
+    if parsed > 0 then
+        customSkipThreshold = parsed
+        DurabilityInput.Text = DurabilityInput.Text:upper()
+    else
+        DurabilityInput.Text = "10T"
+        customSkipThreshold = 10000000000000
+    end
+end)
+
+local function getPlayerDurability(player)
+    local durabilityStat = nil
+    if player:FindFirstChild("Durability") then
+        durabilityStat = player.Durability
+    elseif player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Durability") then
+        durabilityStat = player.leaderstats.Durability
+    else
+        for _, child in ipairs(player:GetChildren()) do
+            if child:IsA("Folder") and child:FindFirstChild("Durability") then
+                durabilityStat = child.Durability
+                break
+            end
+        end
+    end
+    if durabilityStat then
+        return parseValue(durabilityStat.Value)
+    end
+    return 0
+end
+
+btnOpen.MouseButton1Click:Connect(function()
+    autoOpenEnabled = not autoOpenEnabled
+    btnOpen.Text = autoOpenEnabled and "🥚 Auto Open Crystal: ON" or "🥚 Auto Open Crystal: OFF"
+    btnOpen.BackgroundColor3 = autoOpenEnabled and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+task.spawn(function()
+    while task.wait(0.2) do
+        if autoOpenEnabled then
+            pcall(function()
+                openCrystalRemote:InvokeServer("openCrystal", crystalName)
+            end)
+        end
+    end
+end)
+
+btnSell.MouseButton1Click:Connect(function()
+    autoSellEnabled = not autoSellEnabled
+    btnSell.Text = autoSellEnabled and "💰 Keep just duals chaos birdies: ON" or "💰 Keep just duals chaos birdies: OFF"
+    btnSell.BackgroundColor3 = autoSellEnabled and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+local function processFolderForSale(folder, isAura)
+    for _, item in pairs(folder:GetChildren()) do
+        if item:IsA("Folder") or item:IsA("Model") then
+            for _, subItem in pairs(item:GetChildren()) do
+                if isAura then
+                    sellPowerUpEvent:FireServer("sellPowerUp", subItem)
+                    task.wait(0.03)
+                else
+                    if not subItem.Name:find(keepPetName) then
+                        sellPetEvent:FireServer("sellPet", subItem)
+                        task.wait(0.03)
+                    end
+                end
+            end
+        else
+            if isAura then
+                sellPowerUpEvent:FireServer("sellPowerUp", item)
+                task.wait(0.03)
+            else
+                if not item.Name:find(keepPetName) then
+                    sellPetEvent:FireServer("sellPet", item)
+                    task.wait(0.03)
+                end
+            end
+        end
+    end
+end
+
+local lastNilCheckTime = 0
+task.spawn(function()
+    while task.wait(0.5) do
+        if autoSellEnabled then
+            pcall(function()
+                local petsFolder = LocalPlayer:FindFirstChild("petsFolder")
+                if petsFolder then processFolderForSale(petsFolder, false) end
+
+                local possibleAuraFolders = {"aurasFolder", "boostsFolder", "powerUpsFolder", "auraFolder"}
+                for _, folderName in ipairs(possibleAuraFolders) do
+                    local auraFolder = LocalPlayer:FindFirstChild(folderName)
+                    if auraFolder then processFolderForSale(auraFolder, true) end
+                end
+
+                local currentTime = tick()
+                if getnilinstances and (currentTime - lastNilCheckTime >= 15) then
+                    lastNilCheckTime = currentTime
+                    for _, nilItem in pairs(getnilinstances()) do
+                        if nilItem.ClassName == "ParticleEmitter" or nilItem.Name:find("Aura") or nilItem.Name:find("Dark Nebula") then
+                            sellPowerUpEvent:FireServer("sellPowerUp", nilItem)
+                            task.wait(0.03)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+local function getGemEnemies()
+    local enemies = {}
+    local battleIsland = workspace:FindFirstChild("enemyNPCs") and workspace.enemyNPCs:FindFirstChild("Battle Island")
+    if battleIsland then
+        local children = battleIsland:GetChildren()
+        local targets = {
+            {index = 2, name = "Alien Girl"}, {index = 9, name = "Ice Ice"},
+            {index = 8, name = "Smiley"}, {index = 7, name = "Mask Of Gold"},
+            {index = 3, name = "Mr. Serious"}, {index = 4, name = "Sky Hawk"},
+            {index = 5, name = "Slitherman"}, {index = 11, name = "Mask Of Gold"}
+        }
+        for _, target in ipairs(targets) do
+            if children[target.index] then
+                local enemy = children[target.index]:FindFirstChild(target.name) or children[target.index]
+                if enemy and (enemy:FindFirstChild("HumanoidRootPart") or enemy:IsA("BasePart")) then
+                    table.insert(enemies, enemy)
+                end
+            end
+        end
+    end
+    return enemies
+end
+
+btnFarm.MouseButton1Click:Connect(function()
+    isFarmingGems = not isFarmingGems
+    btnFarm.Text = isFarmingGems and "💎 Auto Farm Gems: ON" or "💎 Auto Farm Gems: OFF"
+    btnFarm.BackgroundColor3 = isFarmingGems and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+task.spawn(function()
+    while true do
+        if isFarmingGems then
+            local gemEnemies = getGemEnemies()
+            for _, enemy in ipairs(gemEnemies) do
+                if not isFarmingGems then break end
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local targetPart = enemy:FindFirstChild("HumanoidRootPart") or enemy:FindFirstChild("Torso") or (enemy:IsA("BasePart") and enemy)
+                    if targetPart then
+                        character.HumanoidRootPart.CFrame = targetPart.CFrame * CFrame.new(0, 3, 0)
+                        local punchArgs = {[1] = "punch", [2] = "leftHand", n = 2}
+                        local mEvent = LocalPlayer:FindFirstChild("muscleEvent")
+                        if mEvent then
+                            for i = 1, 5 do
+                                pcall(function() mEvent:FireServer(unpack(punchArgs, 1, punchArgs.n or #punchArgs)) end)
+                                task.wait(0.2)
+                            end
+                        end
+                    end
+                end
+                task.wait(0.5)
+            end
+        else
+            task.wait(0.5)
+        end
+    end
+end)
+
+btnAutoGlitch.MouseButton1Click:Connect(function()
+    isAutoGlitchActive = not isAutoGlitchActive
+    btnAutoGlitch.Text = isAutoGlitchActive and "⚡ Smart Auto Glitch: ON" or "⚡ Smart Auto Glitch: OFF"
+    btnAutoGlitch.BackgroundColor3 = isAutoGlitchActive and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+task.spawn(function()
+    local nextTeleport = 0
+    while task.wait(0.1) do
+        if isAutoGlitchActive then
+            pcall(function()
+                local currentTime = tick()
+                local char = LocalPlayer.Character
+                if currentTime >= nextTeleport then
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        char.HumanoidRootPart.CFrame = glitchTargetCFrame
+                    end
+                    nextTeleport = currentTime + 2
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        if isAutoGlitchActive then
+            pcall(function()
+                local character = LocalPlayer.Character
+                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                local backpack = LocalPlayer:FindFirstChild("Backpack")
+                if humanoid and humanoid.Health > 0 then
+                    local tool = character:FindFirstChild("Pushups") or (backpack and backpack:FindFirstChild("Pushups"))
+                    if tool and tool.Parent == backpack then
+                        humanoid:EquipTool(tool)
+                    end
+                end
+            end)
+            task.wait(4)
+        end
+    end
+end)
+
+task.spawn(function()
+    local leftHandArgs = {[1] = "punch", [2] = "leftHand", n = 2}
+    local rightHandArgs = {[1] = "punch", [2] = "rightHand", n = 2}
+    local pushupArgs = {
+        [1] = "rep",
+        [2] = workspace:WaitForChild("XrurouniXkenshinX4"):WaitForChild("Pushups"),
+        n = 2,
+    }
+    while true do
+        if isAutoGlitchActive then
+            pcall(function()
+                local mEvent = LocalPlayer:FindFirstChild("muscleEvent")
+                if mEvent then
+                    mEvent:FireServer(unpack(leftHandArgs, 1, leftHandArgs.n or #leftHandArgs))
+                    mEvent:FireServer(unpack(rightHandArgs, 1, rightHandArgs.n or #rightHandArgs))
+                    mEvent:FireServer(unpack(pushupArgs, 1, pushupArgs.n or #pushupArgs))
+                end
+            end)
+            RunService.RenderStepped:Wait()
+        else
+            task.wait(0.2)
+        end
+    end
+end)
+
+local afkPosition = CFrame.new(0, 10000, 0)
+
+btnAfkSky.MouseButton1Click:Connect(function()
+    isAfkSkyActive = not isAfkSkyActive
+    btnAfkSky.Text = isAfkSkyActive and "☁️ AFK Sky + Reps: ON" or "☁️ AFK Sky + Reps: OFF"
+    btnAfkSky.BackgroundColor3 = isAfkSkyActive and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+    
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    if isAfkSkyActive then
+        if not safePlatePart then
+            safePlatePart = Instance.new("Part")
+            safePlatePart.Name = "AfkSafePlate"
+            safePlatePart.Size = Vector3.new(40, 1, 40)
+            safePlatePart.CFrame = afkPosition - Vector3.new(0, 3, 0)
+            safePlatePart.Anchored = true
+            safePlatePart.CanCollide = true
+            safePlatePart.Transparency = 0.2
+            safePlatePart.BrickColor = BrickColor.new("Really black")
+            safePlatePart.Parent = workspace
+        end
+        character.HumanoidRootPart.CFrame = afkPosition
+    else
+        if safePlatePart then
+            safePlatePart:Destroy()
+            safePlatePart = nil
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if isAfkSkyActive then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if not character then return end
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                local backpack = LocalPlayer:FindFirstChild("Backpack")
+                if humanoid and humanoid.Health > 0 then
+                    local toolName = "Pushups"
+                    local tool = character:FindFirstChild(toolName) or (backpack and backpack:FindFirstChild(toolName))
+                    if tool then
+                        if tool.Parent == backpack then
+                            humanoid:EquipTool(tool)
+                            task.wait(0.2)
+                        end
+                        local mEvent = LocalPlayer:FindFirstChild("muscleEvent")
+                        if mEvent then
+                            local args = {[1] = "rep", [2] = tool, n = 2}
+                            mEvent:FireServer(unpack(args, 1, args.n or #args))
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        if isAfkSkyActive then
+            local character = LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                if (character.HumanoidRootPart.Position - afkPosition.Position).Magnitude > 60 then
+                    character.HumanoidRootPart.CFrame = afkPosition
+                end
+            end
+        end
+    end
+end)
+
+btnSkipTough.MouseButton1Click:Connect(function()
+    skipToughPlayersEnabled = not skipToughPlayersEnabled
+    btnSkipTough.Text = skipToughPlayersEnabled and "🛡️ Skip Tough Durability: ON" or "🛡️ Skip Tough Durability: OFF"
+    btnSkipTough.BackgroundColor3 = skipToughPlayersEnabled and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+btnSkipFriends.MouseButton1Click:Connect(function()
+    skipFriendsEnabled = not skipFriendsEnabled
+    btnSkipFriends.Text = skipFriendsEnabled and "👥 Skip Friends: ON" or "👥 Skip Friends: OFF"
+    btnSkipFriends.BackgroundColor3 = skipFriendsEnabled and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+btnKillAll.MouseButton1Click:Connect(function()
+    isKillAllActive = not isKillAllActive
+    btnKillAll.Text = isKillAllActive and "⚔️ Kill All Players: ON" or "⚔️ Kill All Players: OFF"
+    btnKillAll.BackgroundColor3 = isKillAllActive and Color3.fromRGB(40, 140, 60) or Color3.fromRGB(45, 45, 60)
+end)
+
+task.spawn(function()
+    local punchArgs = {[1] = "punch", [2] = "leftHand", n = 2}
+    while task.wait(0.1) do
+        if isKillAllActive then
+            pcall(function()
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if not isKillAllActive then break end
+                    if player ~= LocalPlayer and player.Character then
+                        if skipFriendsEnabled and player:IsFriendsWith(LocalPlayer.UserId) then
+                            continue
+                        end
+                        if skipToughPlayersEnabled then
+                            local playerDurability = getPlayerDurability(player)
+                            if playerDurability >= customSkipThreshold then
+                                continue
+                            end
+                        end
+
+                        local targetChar = player.Character
+                        local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+                        local targetHumanoid = targetChar:FindFirstChild("Humanoid")
+
+                        if targetRoot and targetHumanoid and targetHumanoid.Health > 0 then
+                            pcall(function()
+                                for _, part in ipairs(targetChar:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.Size = Vector3.new(16, 16, 16)
+                                        part.Transparency = 0.9
+                                        part.CanCollide = false
+                                    end
+                                end
+                            end)
+
+                            local connection
+                            connection = RunService.RenderStepped:Connect(function()
+                                local myChar = LocalPlayer.Character
+                                if not isKillAllActive or not targetChar.Parent or targetHumanoid.Health <= 0 then
+                                    if connection then connection:Disconnect() end
+                                    return
+                                end
+                                if skipFriendsEnabled and player:IsFriendsWith(LocalPlayer.UserId) then
+                                    if connection then connection:Disconnect() end
+                                    return
+                                end
+                                if skipToughPlayersEnabled and getPlayerDurability(player) >= customSkipThreshold then
+                                    if connection then connection:Disconnect() end
+                                    return
+                                end
+                                if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                                    myChar.HumanoidRootPart.CFrame = targetRoot.CFrame * CFrame.new(0, 2, 2.5)
+                                    myChar.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                end
+                            end)
+
+                            local mEntityEvent = LocalPlayer:FindFirstChild("muscleEvent")
+                            while isKillAllActive and targetHumanoid and targetHumanoid.Health > 0 and targetChar.Parent do
+                                if skipFriendsEnabled and player:IsFriendsWith(LocalPlayer.UserId) then break end
+                                if skipToughPlayersEnabled and getPlayerDurability(player) >= customSkipThreshold then break end
+                                if mEntityEvent then
+                                    pcall(function()
+                                        mEntityEvent:FireServer(unpack(punchArgs, 1, punchArgs.n or #punchArgs))
+                                    end)
+                                end
+                                task.wait(0.05)
+                            end
+
+                            if connection then connection:Disconnect() end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+print("Kenshin Hub Pro Loaded Successfully (VIP Exclusive Paid Keys)!")
