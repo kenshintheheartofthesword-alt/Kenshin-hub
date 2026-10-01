@@ -3,7 +3,6 @@ local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- إزالة أي واجهة قديمة لنفس الرسالة منعاً للتكرار
 if PlayerGui:FindFirstChild("ScriptUpdateGUI") then
     PlayerGui.ScriptUpdateGUI:Destroy()
 end
